@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+:root {
+  font-family: 'Inter', system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+/* 1. Cyberpunk SOC Theme */
+[data-theme="cyberpunk"] {
+  --color-bg-primary: #050811;
+  --color-bg-secondary: #0b1120;
+  --color-bg-card: #0f172a;
+  --color-text-primary: #00D4FF;
+  --color-text-secondary: #00FF88;
+  --color-border: #1e293b;
+  --color-accent: #ef4444;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  color-scheme: dark;
+}
+
+/* 2. Enterprise SaaS Theme */
+[data-theme="enterprise"] {
+  --color-bg-primary: #f8fafc;
+  --color-bg-secondary: #ffffff;
+  --color-bg-card: #ffffff;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-border: #e2e8f0;
+  --color-accent: #0284c7;
+  --font-mono: 'Inter', sans-serif;
+  color-scheme: light;
+}
+
+/* 3. Developer-First Theme */
+[data-theme="developer"] {
+  --color-bg-primary: #1e1e1e;
+  --color-bg-secondary: #252526;
+  --color-bg-card: #2d2d2d;
+  --color-text-primary: #d4d4d4;
+  --color-text-secondary: #9cdcfe;
+  --color-border: #3e3e42;
+  --color-accent: #007acc;
+  --font-mono: 'Fira Code', 'Cascadia Code', monospace;
+  color-scheme: dark;
+}
+
+/* 4. Glassmorphism Theme */
+[data-theme="glassmorphism"] {
+  --color-bg-primary: #0d0722;
+  --color-bg-secondary: rgba(255, 255, 255, 0.05);
+  --color-bg-card: rgba(255, 255, 255, 0.07);
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #cbd5e1;
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-accent: #8b5cf6;
+  --font-mono: 'Inter', sans-serif;
+  color-scheme: dark;
+}
+
+/* Custom Utilities for Theme Specific Visuals */
+.cyberpunk-grid {
+  background-image: linear-gradient(to right, rgba(0, 212, 255, 0.05) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.glass-card-hover {
+  transition: all 0.3s ease;
+}
+
+.glass-card-hover:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 25px 50px rgba(139, 92, 246, 0.15);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Keyframes for animations */
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 4s infinite ease-in-out;
+}
