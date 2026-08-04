@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { Header } from "./components/Header";
+import { Sidebar } from "./components/Sidebar";
 import { ThemeSwitcher } from "./components/ThemeSwitcher";
 import { CyberpunkSocView } from "./components/CyberpunkSocView";
 import { EnterpriseSaasView } from "./components/EnterpriseSaasView";
@@ -41,6 +42,48 @@ const AppContent: React.FC = () => {
   const [selectedNodeId, setSelectedNodeId] = useState<string>("msk-kafka");
   const [selectedTerraformModule, setSelectedTerraformModule] = useState<string>("networking");
   const [liveEps, setLiveEps] = useState<number>(18450);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem("secops_sidebar_collapsed");
+      return saved ? JSON.parse(saved) : false;
+    } catch {
+      return false;
+    }
+  });
+
+  const [favorites, setFavorites] = useState<ActiveTab[]>(() => {
+    try {
+      const saved = localStorage.getItem("secops_favorite_tabs");
+      if (saved) return JSON.parse(saved);
+    } catch {
+      // fallback
+    }
+    return ["security-dashboard", "vulnerability-mgmt", "ai-architect", "threat-detection", "cicd"];
+  });
+
+  const handleToggleFavorite = (tab: ActiveTab) => {
+    setFavorites((prev) => {
+      const updated = prev.includes(tab) ? prev.filter(t => t !== tab) : [...prev, tab];
+      try {
+        localStorage.setItem("secops_favorite_tabs", JSON.stringify(updated));
+      } catch (err) {
+        console.warn("Could not save favorites", err);
+      }
+      return updated;
+    });
+  };
+
+  const handleToggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("secops_sidebar_collapsed", JSON.stringify(next));
+      } catch (err) {
+        console.warn("Could not save sidebar collapsed state", err);
+      }
+      return next;
+    });
+  };
 
   const [vars, setVars] = useState<CustomVariables>({
     awsRegion: "us-east-1",
@@ -200,22 +243,44 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen transition-colors duration-300 bg-[var(--color-bg-primary,#050811)] text-[var(--color-text-primary,#00D4FF)]">
+    <div className="min-h-screen flex flex-col transition-colors duration-300 bg-[var(--color-bg-primary,#050811)] text-[var(--color-text-primary,#00D4FF)]">
       {/* Universal Header with Module Navigation & Quick Configuration */}
       <Header
         vars={vars}
-        onUpdateVars={setVars}
+        setVars={setVars}
         rules={rules}
-        onUpdateRules={setRules}
+        setRules={setRules}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         liveEps={liveEps}
+        onImportPackage={(pkg) => {
+          if (pkg.pipelineConfig) setVars(pkg.pipelineConfig);
+          if (pkg.sigmaRules) setRules(pkg.sigmaRules);
+        }}
+        isSidebarCollapsed={isSidebarCollapsed}
+        onToggleSidebar={handleToggleSidebar}
       />
 
-      {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {renderMainView()}
-      </main>
+      {/* Main Container with Categorized Sidebar */}
+      <div className="flex flex-1 overflow-hidden min-h-[calc(100vh-80px)]">
+        <Sidebar
+          activeTab={activeTab}
+          onNavigateTab={setActiveTab}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={handleToggleSidebar}
+          favorites={favorites}
+          onToggleFavorite={handleToggleFavorite}
+          onOpenCommandPalette={() => {
+            const event = new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true });
+            window.dispatchEvent(event);
+          }}
+        />
+
+        {/* Main View Area */}
+        <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto w-full">
+          {renderMainView()}
+        </main>
+      </div>
 
       {/* Floating Theme Switcher Bar (Quickly toggle between Cyberpunk SOC, Enterprise SaaS, Developer IDE, Glassmorphism Hub) */}
       <ThemeSwitcher variant="floating" />
